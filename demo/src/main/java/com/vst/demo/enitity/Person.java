@@ -21,12 +21,15 @@ public class Person {
     @JoinColumn(name = "department_id")
     private Department department;
 
+    @Column(name = "email")
+    private String email;
 
-    public Person(int id, String name, String surname, String email) {
+    public Person(int id, String name, String surname, String email, Department department) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.email = email;
+        this.department = department;
     }
 
     public String getEmail() {
@@ -37,8 +40,6 @@ public class Person {
         this.email = email;
     }
 
-    @Column(name = "email")
-    private String email;
 
 
 
