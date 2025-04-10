@@ -1,6 +1,7 @@
 package com.vst.demo.controllerTests;
 
 import com.vst.demo.controllers.PersonController;
+import com.vst.demo.enitity.Department;
 import com.vst.demo.enitity.Person;
 import com.vst.demo.service.PersonService;
 import org.junit.jupiter.api.AutoClose;
@@ -15,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonControllerTest {
@@ -39,13 +40,44 @@ public class PersonControllerTest {
     @Test
     void testPersonById() throws Exception{
         Person person = new Person(
-                2,"Олег", "Тиньков", "oleg-tinkov@exmple.com", null);
-        Mockito.when(personService.getPersonById(2)).thenReturn(person);
+                1,"Кузьма", "Елисеев", "kuzma-eliseev@exmple.com", null);
+        Mockito.when(personService.getPersonById(1)).thenReturn(person);
 
-        mockMvc.perform(get("/person/2")).
+
+        mockMvc.perform(get("/person/1")).
                 andDo(print())
                 .andExpect(status().isOk())      // ожидаем 200
-                .andExpect(jsonPath("$.name").value("Олег"))
-                .andExpect(jsonPath("$.surname").value("Тиньков"));
+                .andExpect(jsonPath("$.name").value("Кузьма"))
+                .andExpect(jsonPath("$.surname").value("Елисеев"));
+    }
+
+    @Test
+    void testAssignDepartmentToPerson() throws Exception{
+
+        Person person = new Person(
+                1,"Кузьма", "Елисеев", "kuzma-eliseev@exmple.com", null);
+        Department department = new Department(1, "IT");
+        Mockito.when(personService.assignDepartmentToPerson(1,1 ))
+                .thenReturn(person);
+
+        mockMvc.perform(put("/person/1/assign-dep/1"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Кузьма"));
+    }
+
+    @Test
+    public void testDeleteById() throws Exception{
+        int personId = 1;
+
+        Mockito.doNothing().when(personService).deleteById(personId);
+
+        mockMvc.perform(delete("/person/{id}", personId))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Mockito.verify(personService, Mockito.times(1)).deleteById(personId);
+
     }
 }
