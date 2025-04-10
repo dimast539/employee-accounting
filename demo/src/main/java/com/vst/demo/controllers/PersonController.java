@@ -1,6 +1,7 @@
 package com.vst.demo.controllers;
 
 import com.vst.demo.enitity.Person;
+import com.vst.demo.exceptions.PersonNotFoundException;
 import com.vst.demo.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -52,9 +53,20 @@ public class PersonController {
             @PathVariable(name = "personID") int personID,
             @PathVariable(name = "departmentID") int departmentID) {
         try {
-           var updatePerson = personService.assignDepartmentToPerson(personID, departmentID);
-           return ResponseEntity.ok(updatePerson);
-        }catch (RuntimeException ex){
+            var updatePerson = personService.assignDepartmentToPerson(personID, departmentID);
+            return ResponseEntity.ok(updatePerson);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<?> updatePerson(@PathVariable int id,
+                                          @RequestBody Person person) {
+        try {
+            var updatePerson = personService.updatePerson(id, person);
+            return ResponseEntity.ok(updatePerson);
+        } catch (PersonNotFoundException ex){
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

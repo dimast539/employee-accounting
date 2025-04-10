@@ -44,20 +44,40 @@ public class PersonService {
         else throw new PersonNotFoundException("Невозможно удалить пользователя");
     }
 
-    public List<Person> findAll(){
+    public List<Person> findAll() {
         return personRepository.findAll();
     }
 
-    public Person assignDepartmentToPerson(int personID, int departmentID){
+    public Person assignDepartmentToPerson(int personID, int departmentID) {
 
-        var person = personRepository.findById(personID).orElseThrow(()->
+        var person = personRepository.findById(personID).orElseThrow(() ->
                 new PersonNotFoundException("Пользователь с таким ID не существует"));
 
-        var department = departmentRepository.findById(departmentID).orElseThrow(()->
+        var department = departmentRepository.findById(departmentID).orElseThrow(() ->
                 new DepartmentNotFoundException("Данного отдела не существует"));
 
         person.setDepartment(department);
 
         return personRepository.save(person);
+    }
+
+    public Person updatePerson(int id, Person updatePerson) {
+
+        var existing = personRepository.findById(id).orElseThrow(()
+                -> new PersonNotFoundException("Пользователь не найден."));
+        if (updatePerson.getName() != null) {
+            existing.setName(updatePerson.getName());
+        }
+        if (updatePerson.getSurname() != null) {
+            existing.setSurname(updatePerson.getSurname());
+        }
+        if (updatePerson.getEmail() != null) {
+            existing.setEmail(updatePerson.getEmail());
+        }
+        if(updatePerson.getDepartment() != null){
+            existing.setDepartment(updatePerson.getDepartment());
+        }
+
+        return personRepository.save(existing);
     }
 }
